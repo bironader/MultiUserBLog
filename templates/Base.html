@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Signika" rel="stylesheet">
+		<link rel="stylesheet" href="../static/css/bootstrap.css">
+		<link rel="stylesheet" href="../static/css/style.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+		<script src="../static/js/script.js"></script>
+		
+		<title>Computer Science Blog</title>
+	</head>
+		<body>
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<img src="../static/images/logo.jpg" class="img-responsive"  alt="Blog logo">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3">
+						<a href="/signup"><button  type="button" class="btn btn-primary btn-lg" id="homebtn">Register</button></a>
+					</div>
+					<div class="col-md-2">
+						<a href="/newblog"><button  type="button" class="btn btn-primary btn-lg" id="homebtn">PostBlog</button></a>
+					</div>
+					<div class="col-md-2">
+						<a href="/home"><button type="button" class="btn btn-primary btn-lg" id="homebtn">Home</button></a>
+					</div>
+					<div class="col-md-3">
+						<a href="/myposts"><button  type="button" class="btn btn-primary btn-lg" id="homebtn">MyPosts</button></a>
+					</div>
+					<div class="col-md-1">
+					{% if not is_logged_in %}
+						<a href="/signin"><button  type="button" class="btn btn-primary btn-lg" id="homebtn">Login</button></a>
+					{% else %}
+						<a href="/logout"><button  type="button" class="btn btn-primary btn-lg" id="homebtn">Logout</button></a>
+					{% endif %}
+					</div>
+						<legend class=""></legend>
+				</div>
+					{% block content %}
+					{% endblock %}
+			</div>
+		</body>	
+</html>

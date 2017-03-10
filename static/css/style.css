@@ -1,0 +1,65 @@
+.header{
+	font-weight: bold;
+	font-family: "Oswald", sans-serif;
+	margin-bottom: 3%;
+	margin-top: 10%;
+}
+.subject{
+	
+	font-weight: bold;
+	font-family: "Oswald", sans-serif;
+	
+}
+hr{
+	border: none;
+	height: 2px;
+	color: #333;
+	background-color: #333;
+	margin-top: 0px;
+}	
+.date{
+	color: gray;
+}
+#error{
+	color: red;
+	margin-top: 0.5%;
+	font-family: "Oswald", sans-serif;
+	
+	
+}
+
+#homebtn{
+	
+	margin-left: 35%;
+	margin-bottom: 5%;
+	
+}
+#welcome{
+	font-family: "Oswald", sans-serif;
+}
+
+
+.user_name{
+    font-size: 14px;
+	color: rgb(128,128,128)
+    
+}
+.comments-list .media{
+    border-bottom: 1px dotted #ccc;
+	margin-bottom: 2%;
+
+}
+#likebtn{
+	margin-left: 0%;
+	margin-top: 0.2%;
+}
+.comment{
+	font-family: "Slabo 27px", serif;
+	font-size: 18px;
+	color: rgb(230, 0, 0);
+}
+.likes{
+	font-family: 'Signika', sans-serif;
+	font-size: 18px;
+}
+

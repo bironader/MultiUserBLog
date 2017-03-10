@@ -1,0 +1,25 @@
+{% extends "Base.html" %}
+{% block content %}
+	<div class="row">
+		<div>
+		  <h3>Post New Blog</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<form method="post">
+			  <div class="form-group">	
+				<label>Subject</label>
+				<input name="subject" class="form-control"  aria-describedby="Blog Subject" placeholder="Enter subject">
+				<label class="error">{{ errorsub }}</label>
+			  </div>
+			  <div class="form-group">
+				<label>Blog</label>
+				<textarea name="textarea" class="form-control"  placeholder="Enter blog" rows="20"></textarea>
+				<label class="error">{{ errorblog }}</label>
+			  </div>
+			  <button type="submit" class="btn btn-primary">Submit</button>
+			</form>	
+		</div>
+	</div>
+{% endblock %}			

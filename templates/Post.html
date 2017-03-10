@@ -1,0 +1,21 @@
+{% extends "Base.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-6">
+			<h4><p class="header">{{post.subject}}</p></h4>
+		</div>
+		<div class="col-md-6">
+			<p class="date" align="right">By {{post.user_name}} in {{post.created}}</p>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<hr>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<p>{{post.artical}}</p>
+		</div>
+	</div>
+	
+{% endblock %}
