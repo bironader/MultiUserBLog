@@ -10,9 +10,9 @@ import validation
 import hashing
 import datetime
 
-JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader
-(os.path.dirname(__file__) + "/templates"),
-                               autoescape=True)
+JINJA_ENV = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__) +
+                                   "/templates"), autoescape=True)
 
 Error = False
 PASSWORD_SALT = ''.join(random.choice(string.letters) for x in xrange(5))
@@ -61,11 +61,13 @@ class BaseHandler(webapp2.RequestHandler):
         current_url = self.request.url
         x = current_url.split('/')
         if self.is_logged_in() and x[3] == 'signup':
-            self.render('Msg.html', msg="You already logged in",
+            self.render('Msg.html',
+                        msg="You already logged in",
                         is_logged_in=self.is_logged_in())
             return True
         elif self.is_logged_in() and x[3] == 'signin':
-            self.render('Msg.html', msg="You already logged in",
+            self.render('Msg.html',
+                        msg="You already logged in",
                         is_logged_in=self.is_logged_in())
             return True
         elif not self.is_logged_in() and x[3] == 'newblog':
@@ -86,7 +88,8 @@ class BaseHandler(webapp2.RequestHandler):
             # the the cookie will end in 2050
             self.response.headers.add_header('Set-Cookie',
                                              '%s=%s; Expires=Sun, '
-                                             '15 Jul 2050 00:00:01 GMT Path=/' % (
+                                             '15 Jul 2050 00:00:01 '
+                                             'GMT Path=/' % (
                                                  name, user_cookie))
 
         else:
@@ -94,18 +97,6 @@ class BaseHandler(webapp2.RequestHandler):
                                              '%s=%s; Path=/' %
                                              (name, user_cookie))
         return user_cookie
-
-
-class MainHandler(BaseHandler):
-    def get(self):
-        blog = db.GqlQuery("SELECT * FROM BlogModel")
-        likes = db.GqlQuery("SELECT * FROM LikeModel")
-        like = db.GqlQuery("SELECT * FROM UserLikes")
-        users = db.GqlQuery("SELECT * FROM UserModel")
-        db.delete(like)
-        db.delete(likes)
-        db.delete(users)
-        db.delete(blog)
 
 
 class WelcomePage(BaseHandler):
@@ -124,7 +115,7 @@ class Msg(BaseHandler):  # error msg appear when user try to access login url
 class FrontPage(BaseHandler):  # home page handler
 
     def get(self):
-        if not self.redirect_user():
+        if not self.redirect_user() and self.is_logged_in():
             is_liked = []
             blogs_id = []
             users_id = []
@@ -149,7 +140,8 @@ class FrontPage(BaseHandler):  # home page handler
                         is_logged_in=self.is_logged_in(),
                         comments=comments, CommentModel=datastore.CommentModel,
                         user_id=self.get_userid(),
-                        likes=likes, LikeModel=datastore.LikeModel,
+                        likes=likes,
+                        LikeModel=datastore.LikeModel,
                         blogs_id=blogs_id,
                         users_id=users_id,
                         is_liked=is_liked)
@@ -160,113 +152,125 @@ class FrontPage(BaseHandler):  # home page handler
                 self.response.write(users_id)
 
     def post(self):
-        # determine if user click on post comment button
-        comment = self.request.get('comment')
-        blog_id = self.request.get('blog-id')
-        # determine if user click on like button
-        onClickLike = self.request.get('onClickLike')
-        # determine if user click on editblog button
-        onClickEdit = self.request.get('edit-blog')
-        # determine if user click on delete blog button
-        onClickDelete = self.request.get('delete-blog')
-        # determine if user click on edit comment button
-        onclickEditComment = self.request.get('edit-comment')
-        # determine if user click on delete comment  button
-        onClickDeleteComment = self.request.get('delete-comment')
-        # determine if user click on unlike blog button
-        onClickUnLike = self.request.get('onClickUnLike')
+        if self.is_logged_in():
 
-        if onClickLike:
-            like = db.GqlQuery("SELECT * FROM LikeModel"
-                               " WHERE blog_id =:1", blog_id)
+            # determine if user click on post comment button
+            comment = self.request.get('comment')
+            blog_id = self.request.get('blog-id')
+            # determine if user click on like button
+            onClickLike = self.request.get('onClickLike')
+            # determine if user click on editblog button
+            onClickEdit = self.request.get('edit-blog')
+            # determine if user click on delete blog button
+            onClickDelete = self.request.get('delete-blog')
+            # determine if user click on edit comment button
+            onclickEditComment = self.request.get('edit-comment')
+            # determine if user click on delete comment  button
+            onClickDeleteComment = self.request.get('delete-comment')
+            # determine if user click on unlike blog button
+            onClickUnLike = self.request.get('onClickUnLike')
+            # get user_id
+            user_id = self.request.get('user-id')
 
-            user_like = db.GqlQuery("SELECT * FROM UserLikes "
-                                    "WHERE blog_id =:1 "
-                                    "and user_id=:2", blog_id,
-                                    self.get_userid())
-            if like.get() is None:
-                current_likes = 1
-                like = datastore.LikeModel(blog_id=blog_id,
-                                           number_likes=current_likes)
-                like.put()
-                user_likes = datastore.UserLikes(user_id=self.get_userid(),
-                                                 blog_id=blog_id, boolean=True)
-                user_likes.put()
+            if onClickLike and user_id is not self.get_userid():
+                like = db.GqlQuery("SELECT * FROM LikeModel"
+                                   " WHERE blog_id =:1", blog_id)
 
-            else:
-                current_likes = like.get().number_likes + 1
+                user_like = db.GqlQuery("SELECT * FROM UserLikes "
+                                        "WHERE blog_id =:1 "
+                                        "and user_id=:2", blog_id,
+                                        self.get_userid())
+
+                if like.get() is None and self.is_logged_in():
+                    current_likes = 1
+                    like = datastore.LikeModel(
+                        blog_id=blog_id,
+                        number_likes=current_likes)
+                    like.put()
+                    user_likes = datastore.UserLikes(
+                        user_id=self.get_userid(),
+                        blog_id=blog_id, boolean=True)
+                    user_likes.put()
+
+                else:
+                    current_likes = like.get().number_likes + 1
+                    like = like.get()
+                    like.number_likes = current_likes
+                    like.put()
+                    user_like = user_like.get()
+                    user_like.boolean = True
+                    user_like.put()
+
+            if onClickUnLike:
+                self.response.write("hi")
+                like = db.GqlQuery("SELECT * FROM LikeModel WHERE"
+                                   " blog_id =:1", blog_id)
+                user_like = db.GqlQuery("SELECT * FROM UserLikes "
+                                        "WHERE blog_id =:1 "
+                                        "and user_id=:2", blog_id,
+                                        self.get_userid())
+                current_likes = like.get().number_likes - 1
                 like = like.get()
                 like.number_likes = current_likes
                 like.put()
                 user_like = user_like.get()
-                user_like.boolean = True
+                user_like.boolean = False
                 user_like.put()
 
-        if onClickUnLike:
-            self.response.write("hi")
-            like = db.GqlQuery("SELECT * FROM LikeModel WHERE"
-                               " blog_id =:1", blog_id)
-            user_like = db.GqlQuery("SELECT * FROM UserLikes "
-                                    "WHERE blog_id =:1 and user_id=:2", blog_id,
-                                    self.get_userid())
-            current_likes = like.get().number_likes - 1
-            like = like.get()
-            like.number_likes = current_likes
-            like.put()
-            user_like = user_like.get()
-            user_like.boolean = False
-            user_like.put()
+            if comment:  # Comment on Post
+                comment_blog = datastore.CommentModel(
+                    content=comment,
+                    user_name=self.get_username(),
+                    user_id=self.get_userid(), blog_id=blog_id)
+                comment_blog.put()
 
-        if comment:  # Comment on Post
-            comment_blog = datastore.CommentModel(content=comment,
-                                                  user_name=self.get_username(),
-                                                  user_id=self.get_userid(), blog_id=blog_id)
-            comment_blog.put()
+            if onClickEdit and self.get_userid() == user_id:  # Edit Post
+                subject = self.request.get('edit-subject')
+                artical = self.request.get('edit-artical')
+                key = db.Key.from_path('BlogModel', long(blog_id))
+                post = db.get(key)
+                if post:
+                    post.subject = subject
+                    post.artical = artical
+                    post.put()
 
-        if onClickEdit:  # Edit Post
-            subject = self.request.get('edit-subject')
-            artical = self.request.get('edit-artical')
-            key = db.Key.from_path('BlogModel', long(blog_id))
-            new_post = db.get(key)
-            if new_post:
-                new_post.subject = subject
-                new_post.artical = artical
-                new_post.put()
+            if onClickDelete \
+                    and self.get_userid() == user_id:  # Delete Post
+                key = db.Key.from_path('BlogModel', long(blog_id))
+                old_post = db.get(key)
+                comments = db.GqlQuery("SELECT * FROM CommentModel"
+                                       " WHERE blog_id =:1", blog_id)
 
-        if onClickDelete:  # Delete Post
-            key = db.Key.from_path('BlogModel', long(blog_id))
-            old_post = db.get(key)
-            comments = db.GqlQuery("SELECT * FROM CommentModel"
-                                   " WHERE blog_id =:1", blog_id)
+                likes = db.GqlQuery("SELECT * FROM LikeModel"
+                                    " WHERE blog_id =:1", blog_id)
 
-            likes = db.GqlQuery("SELECT * FROM LikesModel"
-                                " WHERE blog_id =:1", blog_id)
+                user_likes = db.GqlQuery("SELECT * FROM UserLikes"
+                                         " WHERE blog_id =:1", blog_id)
+                if old_post:
+                    db.delete(old_post)
+                    db.delete(comments)
+                    db.delete(user_likes)
+                    db.delete(likes)
 
-            user_likes = db.GqlQuery("SELECT * FROM UserLikes"
-                                     " WHERE blog_id =:1", blog_id)
-            if old_post:
-                db.delete(old_post)
-                db.delete(comments)
-                db.delete(user_likes)
-                db.delete(likes)
+            if onclickEditComment \
+                    and self.get_userid() == user_id:  # Edit comment
+                edit_comment = self.request.get('edit-comment')
+                comment_id = self.request.get('comment-id')
+                key = db.Key.from_path('CommentModel', long(comment_id))
+                new_comment = db.get(key)
+                if new_comment:
+                    new_comment.content = edit_comment
+                    new_comment.put()
 
-        if onclickEditComment:  # Edit comment
-            edit_comment = self.request.get('edit-comment')
-            comment_id = self.request.get('comment-id')
-            key = db.Key.from_path('CommentModel', long(comment_id))
-            new_comment = db.get(key)
-            if new_comment:
-                new_comment.content = edit_comment
-                new_comment.put()
+            if onClickDeleteComment \
+                    and self.get_userid() == user_id:  # Delete Comment
+                comment_id = self.request.get('comment-id')
+                key = db.Key.from_path('CommentModel', long(comment_id))
+                old_comment = db.get(key)
+                if old_comment:
+                    db.delete(old_comment)
 
-        if onClickDeleteComment:  # Delete Comment
-            comment_id = self.request.get('comment-id')
-            key = db.Key.from_path('CommentModel', long(comment_id))
-            old_comment = db.get(key)
-            if old_comment:
-                db.delete(old_comment)
-
-        self.redirect('/home')
+            self.redirect('/home')
 
 
 class BlogPost(BaseHandler):  # blog form handler
@@ -283,34 +287,35 @@ class BlogForm(BaseHandler):  # Blog form page handler
                         is_logged_in=self.is_logged_in())
 
     def post(self):
-        subject = self.request.get('subject')
-        artical = self.request.get('textarea')
-        if subject and artical:
-            blog = datastore.BlogModel(subject=subject,
-                                       artical=artical,
-                                       user_id=self.get_userid(),
-                                       user_name=self.get_username())
-            blog.put()  # add blog
-            self.redirect('/%s' % blog.key().id())
+        if self.is_logged_in():
+            subject = self.request.get('subject')
+            artical = self.request.get('textarea')
+            if subject and artical and self.is_logged_in():
+                blog = datastore.BlogModel(subject=subject,
+                                           artical=artical,
+                                           user_id=self.get_userid(),
+                                           user_name=self.get_username())
+                blog.put()  # add blog
+                self.redirect('/%s' % blog.key().id())
 
-        # Validation stuff
-        elif subject and not artical:
-            self.render('BlogForm.html',
-                        errorblog="Enter Blog",
-                        is_logged_in=self.is_logged_in())
-        elif artical and not subject:
-            self.render('BlogForm.html',
-                        errorsub="Enter Subject",
-                        is_logged_in=self.is_logged_in())
-        else:
-            self.render('BlogForm.html', errorsub="Enter Subject",
-                        errorblog="Enter Blog",
-                        is_logged_in=self.is_logged_in())
+            # Validation stuff
+            elif subject and not artical:
+                self.render('BlogForm.html',
+                            errorblog="Enter Blog",
+                            is_logged_in=self.is_logged_in())
+            elif artical and not subject:
+                self.render('BlogForm.html',
+                            errorsub="Enter Subject",
+                            is_logged_in=self.is_logged_in())
+            else:
+                self.render('BlogForm.html', errorsub="Enter Subject",
+                            errorblog="Enter Blog",
+                            is_logged_in=self.is_logged_in())
 
 
 class MyPosts(BaseHandler):
     def get(self):
-        if not self.redirect_user():
+        if not self.redirect_user() and self.is_logged_in():
             blogs = db.GqlQuery("SELECT * FROM BlogModel WHERE "
                                 "user_id =:1", self.get_userid())
             comments = db.GqlQuery("SELECT * FROM CommentModel")
@@ -339,13 +344,15 @@ class RegistrationForm(BaseHandler):  # signup form handler
             params = dict()
 
             if not validation.valid_user(username=username):
-                params['usererror'] = "Username must be unique and can contain any letters " \
+                params['usererror'] = "Username must be unique " \
+                                      "and can contain any letters " \
                                       "or numbers, without spaces."
                 Error = True
 
             if not validation.valid_password(password=password):
-                params['passworderror'] = "Password should be " \
-                                          "at least 4 characters."
+                params['passworderror'] = \
+                    "Password should be " \
+                    "at least 4 characters."
                 Error = True
 
             if conf_passowrd != password:
@@ -411,7 +418,7 @@ class Logout(BaseHandler):  # logout and remove user_id
 app = webapp2.WSGIApplication([
     ('/newblog', BlogForm), ('/home', FrontPage),
     ('/signup', RegistrationForm), ('/signin', Login),
-    ('/', MainHandler), ('/error', Msg),
+    ('/error', Msg),
     ('/logout', Logout),
     (r'/([0-9]+)', BlogPost),
     ('/welcome', WelcomePage),

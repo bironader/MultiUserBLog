@@ -34,6 +34,7 @@
 						<input type="submit" class="confirm btn btn-primary" name="delete-blog" value="Delete">
 						<input type="hidden" name="blog-id">
 						<input type="hidden" name="comment-id">
+						<input type="hidden" name="user-id">	
 					</form>
 				</div>
 			</div>
@@ -66,6 +67,7 @@
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 						<input type="submit" class="btn btn-primary" name="edit-blog" value="Edit">
 						<input type="hidden" name="blog-id">
+						<input type="hidden" name="user-id" >
 					</div>
 				</form>
 			</div>
@@ -92,6 +94,7 @@
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 						<input type="submit" class="btn btn-primary"  value="Edit">
 						<input type="hidden" name="comment-id">
+						<input type="hidden" name="user-id" >
 					</div>
 				</form>
 			</div>
@@ -123,10 +126,12 @@
 				<div class="hidden blog-id">{{BlogModel.key().id()}}</div>
 				<div class="hidden subject">{{BlogModel.subject}}</div>
 				<div class="hidden blog">{{BlogModel.artical}}</div>
+				<div class="hidden user-id">{{BlogModel.user_id}}</div>
 			</button>
 			<button type="button" data-toggle="modal" data-target="#warning-modal" class="delete-blog btn btn-danger btn pull-right">
 				<span class="glyphicon glyphicon-remove"></span>
 				<div class="hidden blog-id">{{BlogModel.key().id()}}</div>
+				<div class="hidden user-id">{{BlogModel.user_id}}</div>
 			</button>
 		</div>
 	{% else %}
@@ -165,10 +170,12 @@
 							<span class="glyphicon glyphicon-pencil"></span>
 							<div class="hidden comment">{{CommentModel.content}}</div>
 							<div class="hidden comment-id"	>{{CommentModel.key().id()}}</div>
+							<div class="hidden user-id"	>{{CommentModel.user_id}}</div>
 						</button>
 						<button type="button" data-toggle="modal" data-target="#warning-modal" class="delete-comment btn btn-default btn pull-right">
 							<span class="glyphicon glyphicon-remove"></span>
 							<div class="hidden comment-id">{{CommentModel.key().id()}}</div>
+							<div class="hidden user-id"	>{{CommentModel.user_id}}</div>
 						</button>
 					</div>
 				{% else %}
@@ -212,6 +219,7 @@
 		<div class="col-md-6" >
 			<form method="POST" id="like">
 				<input type="hidden" name="blog-id" value={{BlogModel.key().id()}} >
+				<input type="hidden" name="user-id" value={{BlogModel.user_id}} >
 					{% if BlogModel.user_id == user_id %}	<!-- check if user want to like his post -->
 						<input type="submit"  class="like-btn btn btn-primary btn-lg disabled" value="You cant like your posts">
 					{% else %}
