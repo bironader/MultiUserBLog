@@ -316,14 +316,33 @@ class BlogForm(BaseHandler):  # Blog form page handler
 class MyPosts(BaseHandler):
     def get(self):
         if not self.redirect_user() and self.is_logged_in():
+            is_liked = []
+            blogs_id = []
+            users_id = []
             blogs = db.GqlQuery("SELECT * FROM BlogModel WHERE "
                                 "user_id =:1", self.get_userid())
             comments = db.GqlQuery("SELECT * FROM CommentModel")
-            self.render('FrontPage.html',
-                        blogs=blogs,
+            likes = db.GqlQuery("SELECT * FROM LikeModel")
+            user_likes = db.GqlQuery("SELECT *FROM UserLikes")
+            for p in user_likes:
+                is_liked.append(p.boolean)
+                blogs_id.append(p.blog_id)
+                users_id.append(p.user_id)
+
+            is_liked.reverse()
+            blogs_id.reverse()  # reserve all this list to pop
+            users_id.reverse()  # it in jinja with the order of blogs
+            self.render('FrontPage.html', blogs=blogs,
                         BlogModel=datastore.BlogModel,
                         is_logged_in=self.is_logged_in(),
-                        comments=comments, CommentModel=datastore.CommentModel)
+                        comments=comments, CommentModel=datastore.CommentModel,
+                        user_id=self.get_userid(),
+                        likes=likes,
+                        LikeModel=datastore.LikeModel,
+                        blogs_id=blogs_id,
+                        users_id=users_id,
+                        is_liked=is_liked)
+
 
 
 class RegistrationForm(BaseHandler):  # signup form handler
