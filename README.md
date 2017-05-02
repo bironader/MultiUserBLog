@@ -7,5 +7,4 @@ Run application localy:
   3- add this project to gae
   4- in url type localhost/projectport/home
   
-clouldly:
-  http://multiuserblog-162123.appspot.com/welcome
+
